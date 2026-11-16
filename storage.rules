@@ -1,0 +1,19 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Temporary 30-second MP4 teasers (strict 25 MB limit, MP4 video content type)
+    match /teasers/{fileName} {
+      allow read: if true;
+      allow write: if request.resource != null
+        && request.resource.size <= 25 * 1024 * 1024
+        && request.resource.contentType.matches('video/mp4');
+      allow delete: if true;
+    }
+
+    // Deny access to any unexpected paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

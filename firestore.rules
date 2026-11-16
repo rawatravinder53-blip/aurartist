@@ -1,0 +1,99 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isNonEmptyString(val, maxLen) {
+      return val is string && val.size() > 0 && val.size() <= maxLen;
+    }
+
+    function isValidEmailOrEmpty(val) {
+      return val is string && val.size() <= 160;
+    }
+
+    // Artists directory
+    match /artists/{artistId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['id', 'name'])
+        && isNonEmptyString(request.resource.data.name, 120);
+      allow delete: if true;
+    }
+
+    // Songs catalog (released, next-release, upcoming)
+    match /songs/{songId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['id', 'artistId', 'title', 'type'])
+        && isNonEmptyString(request.resource.data.title, 180)
+        && request.resource.data.type in ['released', 'next-release', 'upcoming'];
+      allow delete: if true;
+    }
+
+    // Chunked media manifests & base64 slices (<= 750KB per doc)
+    match /media_chunks/{chunkId} {
+      allow read: if true;
+      allow create, update: if request.resource.size() < 900000;
+      allow delete: if true;
+    }
+
+    // Fan accounts & notification subscriptions
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['name'])
+        && isNonEmptyString(request.resource.data.name, 120)
+        && (!('email' in request.resource.data) || isValidEmailOrEmpty(request.resource.data.email));
+      allow delete: if true;
+    }
+
+    // Strict 1-vote-per-user-per-artist poll doc: {artistId}_{userKey}
+    match /votes/{voteId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['artistId', 'candidateId', 'songTitle'])
+        && !exists(/databases/$(database)/documents/votes/$(voteId));
+      allow update: if false;
+      allow delete: if true;
+    }
+
+    // Likes per song per fan
+    match /likes/{likeId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAll(['artistId', 'songId', 'songTitle']);
+      allow delete: if true;
+    }
+
+    // Fan share events & Top Fans referral leaderboard
+    match /shares/{shareId} {
+      allow read: if true;
+      allow create, update: if request.resource.data.keys().hasAny(['fanCode', 'songTitle']);
+      allow delete: if true;
+    }
+
+    // Push notifications log
+    match /notifications/{notifId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['title', 'body']);
+      allow update, delete: if true;
+    }
+
+    // User Login audit logs
+    match /login_logs/{logId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['userName', 'userEmail', 'userPhone']);
+      allow update: if false;
+      allow delete: if true;
+    }
+
+    // Released Song listen audit logs
+    match /listens/{listenId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['songTitle', 'userName']);
+      allow update: if false;
+      allow delete: if true;
+    }
+
+    // Global settings (e.g. voiceWatermark)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create, update: if request.resource.size() < 900000;
+      allow delete: if true;
+    }
+  }
+}

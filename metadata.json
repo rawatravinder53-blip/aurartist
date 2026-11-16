@@ -1,0 +1,8 @@
+{
+  "name": "AURARTIST Fan App",
+  "description": "Premier multi-artist music hub and compact fan experience.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

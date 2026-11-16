@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#050308" />
+    <title>AURARTIST | Official Artist Music Hub</title>
+    <meta name="description" content="Official AURARTIST music hub for Ravinder Rawat — Released tracks, exclusive 30s teasers, live countdowns, and fan voting." />
+    <meta property="og:title" content="AURARTIST | Official Artist Music Hub" />
+    <meta property="og:description" content="Official AURARTIST music hub for Ravinder Rawat — Released tracks, exclusive 30s teasers, live countdowns, and fan voting." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('aurartist_theme');
+          var mode = saved === 'light' ? 'light' : 'dark';
+          var root = document.documentElement;
+          root.classList.remove('light', 'dark');
+          root.classList.add(mode);
+          root.setAttribute('data-theme', mode);
+          root.style.colorScheme = mode;
+          var meta = document.querySelector('meta[name="theme-color"]');
+          if (meta) meta.setAttribute('content', mode === 'light' ? '#FFF8ED' : '#050308');
+        } catch (e) {
+          document.documentElement.classList.add('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class="selection:bg-[#D4AF37]/30 antialiased min-h-[100dvh]">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
